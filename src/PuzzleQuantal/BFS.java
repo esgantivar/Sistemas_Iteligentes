@@ -57,12 +57,12 @@ public class BFS {
         return tablero;
     }
     
-    private static boolean compararArray(ArrayList<int[][]> a1,int[][] a2){
-        for (int[][] h : a1) {
-            
-        }
-        return true;
-    }
+//    private static boolean compararArray(ArrayList<int[][]> a1,int[][] a2){
+//        for (int[][] h : a1) {
+//            
+//        }
+//        return true;
+//    }
 
     private static int[] buscarVacio() {
         int[] resultado = new int[2];
