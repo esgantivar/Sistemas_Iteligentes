@@ -1,103 +1,79 @@
 package PuzzleQuantal;
 
-import static PuzzleQuantal.Puzzle.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
-
 
 public class BFS {
 
-    private static final ArrayList<int[][]> estadosRecorridos = new ArrayList<>();
-    private static Queue<int[][]> opciones = new LinkedList<>();
-    private static int[][] tablero = getTablero();
+    private static Map<String,Integer> tablerosRepetidos = new HashMap<>();
+    private static Queue<String> listaDeTableros = new LinkedList<>();
+    private static String tablero = Puzzle.getTablero();
+    private static Map<String,String> stateHistory = new HashMap<String,String>();
 
-    public static int[][] recorridoBFS() {
-
-//        tablero = getTablero();
-        estadosRecorridos.add(deepCopyIntMatrix(tablero));
-        int[] coordenadas;
-        int filaVacio;
-        int columnaVacio;
-        int[][] tableroTemporal;
-        while (!estaOrdenado(tablero)) {
-            coordenadas = buscarVacio();
-            filaVacio = coordenadas[0];
-            columnaVacio = coordenadas[1];
-            if (coordenadaValida(filaVacio + 1, columnaVacio)) {
-                tableroTemporal = tableroTemporal(filaVacio, columnaVacio, filaVacio + 1, columnaVacio);
-                if (!estadosRecorridos.contains(deepCopyIntMatrix(tableroTemporal))) {
-                    opciones.add(deepCopyIntMatrix(tableroTemporal));
-                }
-            }
-            if (coordenadaValida(filaVacio, columnaVacio + 1)) {
-                tableroTemporal = tableroTemporal(filaVacio, columnaVacio, filaVacio, columnaVacio + 1);
-                if (!estadosRecorridos.contains(deepCopyIntMatrix(tableroTemporal))) {
-                    opciones.add(deepCopyIntMatrix(tableroTemporal));
-                }
-            }
-            if (coordenadaValida(filaVacio - 1, columnaVacio)) {
-                tableroTemporal = tableroTemporal(filaVacio, columnaVacio, filaVacio - 1, columnaVacio);
-                if (!estadosRecorridos.contains(deepCopyIntMatrix(tableroTemporal))) {
-                    opciones.add(deepCopyIntMatrix(tableroTemporal));
-                }
-            }
-            if (coordenadaValida(filaVacio, columnaVacio - 1)) {
-                tableroTemporal = tableroTemporal(filaVacio, columnaVacio, filaVacio, columnaVacio - 1);
-                if (!estadosRecorridos.contains(deepCopyIntMatrix(tableroTemporal))) {
-                    opciones.add(deepCopyIntMatrix(tableroTemporal));
-                }
-            }
-
-            tablero = deepCopyIntMatrix(opciones.poll());
-            imprimirTablero(tablero);
-            estadosRecorridos.add(deepCopyIntMatrix(tablero));
+    public static void recorridoBFS() {
+        
+        agregar(tablero,null,0);
+        
+        while(listaDeTableros.peek()!=null){            
+            arriba(listaDeTableros.peek());
+            abajo(listaDeTableros.peek());
+            izquierda(listaDeTableros.peek());
+            derecha(listaDeTableros.remove());
         }
-
-        return tablero;
+        System.out.println("no hay solucion");
     }
     
-//    private static boolean compararArray(ArrayList<int[][]> a1,int[][] a2){
-//        for (int[][] h : a1) {
-//            
-//        }
-//        return true;
-//    }
-
-    private static int[] buscarVacio() {
-        int[] resultado = new int[2];
-        for (int fil = 0; fil < tablero.length; fil++) {
-            for (int col = 0; col < tablero[fil].length; col++) {
-                if (tablero[fil][col] == 0) {
-                    resultado[0] = fil;
-                    resultado[1] = col;
-                    return resultado;
-                }
-            }
+    private static void agregar(String siguiente,String anterior,int n){
+        if(!tablerosRepetidos.containsKey(siguiente)){
+            tablerosRepetidos.put(siguiente,n);
+            listaDeTableros.add(siguiente);
+            stateHistory.put(siguiente,anterior);
         }
-        return null;
-    }
-
-    private static boolean coordenadaValida(int fila, int columna) {
-        return (fila >= 0 && columna >= 0 && fila <= 2 && columna <= 2);
-    }
-
-    private static int[][] tableroTemporal(int filOrigen, int colOrigen, int filDestino, int colDestino) {
-        int[][] tableroTemporal = deepCopyIntMatrix(tablero);
-        tableroTemporal[filOrigen][colOrigen] = tableroTemporal[filDestino][colDestino];
-        tableroTemporal[filDestino][colDestino] = 0;
-        return tableroTemporal;
     }
     
-    //clonar arreglo 2 dimensiones (Gracias Adam)
-    public static int[][] deepCopyIntMatrix(int[][] input) {
-        if (input == null) {
-            return null;
+    private static void arriba(String actual){
+        int a = actual.indexOf("0");
+        if(a>2){
+            String siguienteTablero = actual.substring(0,a-3)+"0"+actual.substring(a-2,a)+actual.charAt(a-3)+actual.substring(a+1);
+            salida(actual,siguienteTablero);
         }
-        int[][] result = new int[input.length][];
-        for (int r = 0; r < input.length; r++) {
-            result[r] = input[r].clone();
-        }
-        return result;
     }
+    private static void abajo(String actual){
+        int a = actual.indexOf("0");
+        if(a<6){
+            String siguienteTablero = actual.substring(0,a)+actual.substring(a+3,a+4)+actual.substring(a+1,a+3)+"0"+actual.substring(a+4);
+            salida(actual,siguienteTablero);
+        }
+    }
+    private static void izquierda(String actual){
+        int a = actual.indexOf("0");
+        if(a!=0 && a!=3 && a!=6){
+            String siguienteTablero = actual.substring(0,a-1)+"0"+actual.charAt(a-1)+actual.substring(a+1);
+            salida(actual,siguienteTablero);
+        }
+    }
+    private static void derecha(String actual){
+        int a = actual.indexOf("0");
+        if(a!=2 && a!=5 && a!=8){
+            String siguienteTablero = actual.substring(0,a)+actual.charAt(a+1)+"0"+actual.substring(a+2);
+            salida(actual,siguienteTablero);
+        }
+    }
+    
+    private static void salida(String anterior,String siguiente){
+        agregar(siguiente,anterior,tablerosRepetidos.get(anterior)+1);
+//        Puzzle.imprimirTablero(s);
+        if(siguiente.equals("123456780")) {
+            System.out.println("la solucion existe en el nivel "+tablerosRepetidos.get(siguiente)+" del arbol");
+            String ruta = siguiente;
+            while (ruta != null) {
+                System.out.println(ruta + " at " + tablerosRepetidos.get(ruta));
+                ruta = stateHistory.get(ruta);
+            }
+            System.exit(0);
+        }
+    }
+    
 }
