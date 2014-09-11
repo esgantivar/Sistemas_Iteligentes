@@ -7,7 +7,6 @@ import static PuzzleQuantal.BFS.recorridoBFS;
 public class Puzzle {
 
     private static String tablero = "506712483";
-    private static String tableroOrdenado = "123456780";
 
     public static String getTablero() {
         return tablero;
