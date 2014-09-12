@@ -160,9 +160,9 @@ public class TeseoSimpleQuantalGraph extends SimpleTeseoAgentProgram {
         for (int a = 0; a < listaRutaCorta.size(); a++) {
             enlace = listaRutaCorta.get(a);
             arrayDeNodos = enlace.split("&");
+            //nodo1 = arrayDeNodos[0].substring(1, arrayDeNodos[0].length());
             nodo1 = arrayDeNodos[0].substring(1, arrayDeNodos[0].length());
-            nodo1 = arrayDeNodos[0].substring(1, arrayDeNodos[0].length());
-            nodo2 = arrayDeNodos[1].substring(0, arrayDeNodos[1].length() - 1);
+            //nodo2 = arrayDeNodos[1].substring(0, arrayDeNodos[1].length() - 1);
             nodo2 = arrayDeNodos[1].substring(0, arrayDeNodos[1].length() - 1);
 
             grafo.removeEdge(enlace);
