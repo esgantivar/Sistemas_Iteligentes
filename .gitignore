@@ -15,5 +15,5 @@
     *.jar
     *.war
     *.ear
-/src/PruebasGraph/
-/src/PruebasHash/
+<<<<<<< HEAD
+>>>>>>> origin/master
