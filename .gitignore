@@ -15,6 +15,5 @@
     *.jar
     *.war
     *.ear
-/build/
-/src/PruebasHash/
 /src/PruebasGraph/
+/src/PruebasHash/
