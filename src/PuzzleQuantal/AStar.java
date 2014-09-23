@@ -1,44 +1,75 @@
+//implementacion del algoritmo A* para resolver el 8-puzzle
+//con calculo de distancia Manhattan
 package PuzzleQuantal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
-public class BFS {
-
+/**
+ *
+ * @author Cesar Galvis
+ */
+public class AStar {
+    
     private static Map<String, Integer> repetidos = new HashMap<>();
     private static Queue<String> listaTableros = new LinkedList<>();
     private static String tablero = Puzzle.getTablero();
     private static Map<String, String> historial = new HashMap<>();
     private static ArrayList<Integer> instrucciones = new ArrayList<>();
+    private static Map<String, Integer> opciones = new HashMap<>();
+    
+    public static void recorridoH() {
 
-    public static void recorridoBFS() {
-
-        agregar(tablero, null, 0);
+        repetidos.put(tablero, 0);
+        listaTableros.add(tablero);
+        historial.put(tablero, null);
+        
         int a;
+        String anterior;
         //mientras que la cola de tableros no este vacia, analizar que 
         //movimientos se pueden realizar en el tablero (arriba, abajo, izq., 
         //der.). Por ultimo se elimina el tablero de la cola
         while (listaTableros.peek() != null) {
             a = listaTableros.peek().indexOf("0");
+            anterior=listaTableros.peek();
             arriba(listaTableros.peek(), a);
             abajo(listaTableros.peek(), a);
             izquierda(listaTableros.peek(), a);
             derecha(listaTableros.remove(), a);
+                        
+            //ordenar opciones de mayor a menor costo de A* y agregarlos
+            // en la cola de tableros:
+            Map<Integer, String> map = sortByValues((HashMap) opciones);
+            Set set2 = map.entrySet();
+            Iterator iterator2 = set2.iterator();
+            while(iterator2.hasNext()) {
+                 Map.Entry me2 = (Map.Entry)iterator2.next();
+                listaTableros.add(me2.getKey().toString());
+                historial.put(me2.getKey().toString(), anterior);                
+            } 
+            opciones.clear();
+            
             verificar();
         }
         if (historial==null)    System.out.println("no hay solucion");
     }
 
-    //agrega tableros en la cola listaTableros, mientras no sean repetidos
+    //verificar que el tablero no sea repetido, en caso de que no sea
+    //asi agregarlo en los repetidos y en la lista de opciones que se 
+    //verificaran mas adelante con A*
     private static void agregar(String siguiente, String anterior, int n) {
         if (!repetidos.containsKey(siguiente)) {
             repetidos.put(siguiente, n);
-            listaTableros.add(siguiente);
-            historial.put(siguiente, anterior);
+            opciones.put(siguiente, h(siguiente));
         }
     }
 
@@ -77,7 +108,6 @@ public class BFS {
 
     private static void verificar(){
         if (listaTableros.contains("123456780")) {
-            System.out.println("la solucion existe en el nivel " + repetidos.get("123456780") + " del arbol");
             System.out.println("tableros revisados: "+repetidos.size());
             instrucciones("123456780");
             listaTableros.clear();
@@ -93,7 +123,6 @@ public class BFS {
             if (ruta == null) {
                 break;
             }
-//            Puzzle.imprimirTablero(ruta);
             int b = ruta.indexOf("0");
 
             if (a == b + 3) {
@@ -127,4 +156,43 @@ public class BFS {
             }
         }
     }
+    
+    //calcular el costo estimado con distancia Manhattan - h(n)
+    private static int h(String tablero) {
+        int suma = 0;
+        int posicion;
+        int fila, columna, fila2, columna2;
+        for (int a = 0; a < 8; a++) {
+            //calcular el indice de la pieza del tablero actual
+            posicion = tablero.indexOf(Integer.toString(a + 1));
+            if ((a != posicion)) {
+                fila = a / 3;
+                columna = a % 3;
+                fila2 = posicion / 3;
+                columna2 = posicion % 3;
+                suma += Math.abs(fila - fila2) + Math.abs(columna - columna2);
+            }
+        }
+        return suma;
+    }
+    
+    //funcion para ordenar opciones por valor en orden descendente
+    //referencias:
+    //http://beginnersbook.com/2013/12/how-to-sort-hashmap-in-java-by-keys-and-values/
+    private static HashMap sortByValues(HashMap map) { 
+       List list = new LinkedList(map.entrySet());
+       Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
+               return ((Comparable) ((Map.Entry) (o1)).getValue())
+                  .compareTo(((Map.Entry) (o2)).getValue());
+            }
+       });
+
+       HashMap sortedHashMap = new LinkedHashMap();
+       for (Iterator it = list.iterator(); it.hasNext();) {
+              Map.Entry entry = (Map.Entry) it.next();
+              sortedHashMap.put(entry.getKey(), entry.getValue());
+       } 
+       return sortedHashMap;
+  }
 }

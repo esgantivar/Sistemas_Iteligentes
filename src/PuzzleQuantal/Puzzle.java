@@ -2,7 +2,7 @@ package PuzzleQuantal;
 //problema  8-puzzle
 
 import static PuzzleQuantal.BFS.recorridoBFS;
-import static PuzzleQuantal.DistanciaManhattan.recorridoH;
+import static PuzzleQuantal.AStar.recorridoH;
 
 
 public class Puzzle {
@@ -18,11 +18,11 @@ public class Puzzle {
         System.out.println("tablero inicial:");
         imprimirTablero(tablero);
 
-        System.out.println("tablero ordenado por BFS");
+        System.out.println("\ntablero ordenado por BFS");
         recorridoBFS();
         
-//        System.out.println("tablero ordenado por A*");
-//        recorridoH();
+        System.out.println("\ntablero ordenado por A*");
+        recorridoH();
     }
 
     public static void imprimirTablero(String tablero) {
