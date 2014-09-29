@@ -7,6 +7,7 @@ import edu.uci.ics.jung.graph.util.EdgeType;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import org.apache.commons.collections15.Transformer;
 
 /**
@@ -15,7 +16,7 @@ import org.apache.commons.collections15.Transformer;
  */
 public class InternalState {
 
-    private InternalState instance;
+    private static InternalState instance;
     private Point currentPosition;
     private ArrayList<Point> pointsVisited;
     private Node currentNode = null;
@@ -40,13 +41,13 @@ public class InternalState {
         wtTransformer = new Transformer<Link, Double>() {
             @Override
             public Double transform(Link link) {
-                return (double)link.getWeight();
+                return (double) link.getWeight();
             }
         };
         alg = new DijkstraShortestPath(memory, wtTransformer);
     }
 
-    public InternalState getInstance() {
+    public static InternalState getInstance() {
         if (instance == null) {
             instance = new InternalState();
         }
@@ -128,7 +129,10 @@ public class InternalState {
     }
 
     public int addPoint(boolean[] _Perception) {
-        pointsVisited.add(currentPosition);
+        if (!pointsVisited.contains(currentPosition)) {
+            pointsVisited.add(new Point(currentPosition));
+        }
+
         /*     El Grafo esta vacio        */
         if (memory.getVertexCount() == 0) {
             addNode(_Perception);
@@ -141,49 +145,51 @@ public class InternalState {
         int paths = 0;
 
         for (boolean b : _Perception) {
-            if (b) {
+            if (!b) {
                 paths += 1;
+            }
+        }
+        //Si la celda tiene mas de dos caminos es un nodo, si no es un paso
+        if (paths > 2) {
+            if (!new Node(currentPosition).equals(currentNode)) {
+                addNode(_Perception);
+            }else{
+                currentLink.clearSteps();
+                addStep(_Perception);
+            }
+        } else {
+            if (currentLink.havePredecessor()) {
+                addStep(_Perception);
             }
         }
 
         stepOptions(_Perception);
-
+        //el conjunto de opciones no es vacio, escoge una opcion de forma aleatoria
         if (!options.isEmpty()) {
-            if (paths > 2) {
-                addNode(_Perception);
-            } else {
-                if (currentLink.havePredecessor()) {
-                    addStep(_Perception);
-                }
-            }
             int rotation = options.remove((int) (Math.random() * options.size()));
-            
-            if (options.size() > 1) {
+            if (options.size() >= 1) {
                 nodePending.add(currentNode);
             }
+            options.clear();
             modifyCurrentState(rotation);
             return rotation;
-        } else {
-            
-            addStep(_Perception);
-            steps = currentLink.getInverseSteps().getSteps();
-            steps.remove(new Node(currentPosition, _Perception, orientation));
-            
-            
-            /*Calculo de la distancia mas corta*/
-            int shortestDistance = (int) Double.POSITIVE_INFINITY;
-            List<Link> shortestPath ;
-            Node nearestNode;
-            
-            for (Node node : nodePending) {
-                int tempDist = (int) alg.getDistance(currentNode, node);
-                if(tempDist<shortestDistance){
-                    shortestDistance=tempDist;
-                    shortestPath=new ArrayList<>(alg.getPath(currentNode, node));
-                    nearestNode=node;
+
+        } else { //No hay opciones de movimiento a celdas no exploradas
+
+            if (!memory.containsVertex(new Node(currentPosition))) {
+                if (steps.isEmpty()) {
+                    steps = new LinkedList(currentLink.getInverseSteps().getSteps());
+                    currentLink.clearSteps();
                 }
+                steps.remove(new Node(currentPosition, _Perception, orientation));
+
+                Node nodeTemp = steps.getFirst();
+                steps.remove(nodeTemp);
+                return interpreteStep(nodeTemp);
+            } else {
+                //el agente ya se encuentra en un nodo, ahora calcular la distancia mas corta
+                System.out.println("ñero llegue a un nodo");
             }
-            
 
         }
 
@@ -192,28 +198,28 @@ public class InternalState {
 
     private void stepOptions(boolean[] _Perception) {
 
-        if (_Perception[0] && alreadyVisited(0)) {
+        if (!_Perception[0] && alreadyVisited(0)) {
             options.add(0);
         }
-        if (_Perception[1] && alreadyVisited(1)) {
+        if (!_Perception[1] && alreadyVisited(1)) {
             options.add(1);
         }
-        if (_Perception[2] && alreadyVisited(2)) {
+        if (!_Perception[2] && alreadyVisited(2)) {
             options.add(2);
         }
-        if (_Perception[3] && alreadyVisited(3)) {
+        if (!_Perception[3] && alreadyVisited(3)) {
             options.add(3);
         }
     }
 
     private int simpleChoiceStep(boolean[] _Perception) {
-        if (_Perception[0]) {
+        if (!_Perception[0]) {
             return 0;
-        } else if (_Perception[1]) {
+        } else if (!_Perception[1]) {
             return 1;
-        } else if (_Perception[3]) {
+        } else if (!_Perception[3]) {
             return 3;
-        } else if (_Perception[2]) {
+        } else if (!_Perception[2]) {
             return 2;
         }
         return -1;
@@ -221,13 +227,20 @@ public class InternalState {
 
     private void addNode(boolean[] _Perception) {
         Node tempNode = new Node(currentPosition, _Perception, orientation);
-        memory.addVertex(tempNode);
+        if (!memory.containsVertex(tempNode)) {
+            memory.addVertex(tempNode);
+        }
+
         currentLink.addStep(tempNode);
+        for (Node b : currentLink.getSteps()) {
+            System.out.println(b.toString());
+        }
+        System.out.println("************************");
+        currentNode = new Node(tempNode);
 
         if (currentLink.havePredecessor()) {
-            memory.addEdge(currentLink, currentNode, tempNode, EdgeType.DIRECTED);
-            currentNode = new Node(tempNode);
-            memory.addEdge(currentLink.getInverseSteps(), tempNode, currentNode, EdgeType.DIRECTED);
+            memory.addEdge(new Link(currentLink), new Node(currentNode), new Node(tempNode), EdgeType.DIRECTED);
+            memory.addEdge(new Link(currentLink.getInverseSteps()), new Node(tempNode), new Node(currentNode), EdgeType.DIRECTED);
             currentLink.clearSteps();
         }
         currentLink.addPredecessor(tempNode);
@@ -237,4 +250,31 @@ public class InternalState {
         currentLink.addStep(new Node(currentPosition, _Perception, orientation));
     }
 
+    private int interpreteStep(Node node) {
+        int east = node.east - currentPosition.east;
+        int north = node.north - currentPosition.north;
+        int rotation = 0;
+
+        if (east == 0 && north == 1) {
+            rotation = 0;
+        } else if (east == 1 && north == 0) {
+            rotation = 1;
+        } else if (east == 0 && north == -1) {
+            rotation = 2;
+        } else if (east == -1 && north == 0) {
+            rotation = 3;
+        }
+        return (rotation + orientation) % 4;
+    }
+
+    public void print(boolean[] _p) {
+        System.out.println("current: " + currentPosition);
+        System.out.println("memory: " + memory.toString());
+        /*System.out.print("perception: ");
+         System.out.print("PF: "+_p[0]);
+         System.out.print(" PD: "+_p[1]);
+         System.out.print(" PA: "+_p[2]);
+         System.out.print(" PI: "+_p[3]+"\n");*/
+
+    }
 }

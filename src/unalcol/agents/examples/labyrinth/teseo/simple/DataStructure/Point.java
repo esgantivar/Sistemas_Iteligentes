@@ -14,6 +14,10 @@ public class Point {
         east = 0;
         north = 0;        
     }
+    public Point(Point p) {
+        east =  p.east;
+        north = p.north;        
+    }
 
     public Point(int _east, int _north) {
         east = _east;
@@ -48,6 +52,10 @@ public class Point {
         long bits = java.lang.Double.doubleToLongBits(Double.valueOf(east));
         bits ^= java.lang.Double.doubleToLongBits((double) north) * 31;
         return (((int) bits) ^ ((int) (bits >> 32)));
+    }
+    @Override
+    public String toString(){
+        return "East: "+east+" North: "+north;
     }
 
 }

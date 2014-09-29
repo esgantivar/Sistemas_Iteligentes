@@ -17,7 +17,7 @@ public class TeseoSimpleQuantalHashMap extends SimpleTeseoAgentProgram {
 
     //private HashMap<Node, Node[]> memory;
     public TeseoSimpleQuantalHashMap() {
-        currentState = currentState.getInstance();
+        currentState = InternalState.getInstance();
         currentState.setCurrentPosition(new Point());
     }
 

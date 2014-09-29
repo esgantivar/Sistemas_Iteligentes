@@ -20,6 +20,12 @@ public class Node extends Point {
         wall= new Wall(_perception,_orientarion);
     }
     
+    public Node(Point p, boolean[] _perception,int _orientarion) {
+        super(p.east, p.north);
+        marked=false;
+        wall= new Wall(_perception,_orientarion);
+    }
+    
     public Node(Point p){
         super(p.east, p.north);
         marked = false;
@@ -37,7 +43,7 @@ public class Node extends Point {
 
     @Override
     public String toString() {
-        return "East: "+this.east+" North: "+this.north;
+        return "(East: "+this.east+" North: "+this.north+")";
     }
 
 }

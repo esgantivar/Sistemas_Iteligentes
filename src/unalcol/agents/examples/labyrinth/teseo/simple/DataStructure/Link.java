@@ -21,6 +21,11 @@ public class Link {
         havePredecessor = true;
         steps.addLast(node);
     }
+    
+    public Link(Link l){
+        steps=l.steps;
+        havePredecessor=l.havePredecessor;
+    }
 
     public Link() {
         steps = new LinkedList<>();
@@ -64,7 +69,7 @@ public class Link {
     public Node getTarget(){
         return steps.getLast();
     }
-    public LinkedList getSteps(){
+    public LinkedList<Node> getSteps(){
         return steps;
     }
 
