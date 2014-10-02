@@ -15,7 +15,8 @@ import org.apache.commons.collections15.Transformer;
  * @author Quantal Team
  */
 public class InternalState {
-    Scanner sc =  new Scanner(System.in);
+
+    Scanner sc = new Scanner(System.in);
     private static InternalState instance;
     private Point currentPosition;
     private ArrayList<Point> pointsVisited;
@@ -163,33 +164,62 @@ public class InternalState {
             return rotation;
 
         } else { //No hay opciones de movimiento a celdas no exploradas
-            if(isNode()){
-                System.out.println("calcular Dijstra");
-                
-                sc.next();
-            }else{
+            if (!isNode()) {
                 /*El agente esta en un paso*/
-                if(steps.isEmpty()){
-                     steps = new LinkedList(currentLink.getInverseSteps().getSteps());
-                     steps.removeFirst();
-                     currentLink.clearSteps();
+                if (steps.isEmpty()) {
+                    steps = new LinkedList(currentLink.getInverseSteps().getSteps());
+                    steps.removeFirst();
+                    currentLink.clearSteps();
                 }
                 System.out.println("+++++++++++++++++++");
                 for (Node b : steps) {
                     System.out.println(b.toString());
                 }
                 System.out.println("+++++++++++++++++++");
-                
+
                 int rotation = interpreteStep(steps.removeFirst());
                 modifyCurrentState(rotation);
-                
-                
+
                 return rotation;
+            } else {
+                double minimunDistance = Double.POSITIVE_INFINITY;
+                List<Link> shortestPath = new ArrayList<>();
+                if (nodePending.isEmpty()) {
+                    for (Node node : memory.getVertices()) {
+                        nodePending.add(node);
+                    }
+                }
+
+                nodePending.remove(currentNode);
+                for (Node b : nodePending) {
+                    if (memory.containsVertex(b)) {
+                        double tempDist = alg.getDistance(currentNode, b).doubleValue();
+                        if (tempDist < minimunDistance) {
+                            minimunDistance = tempDist;
+                            shortestPath = alg.getPath(currentNode, b);
+                        }
+                    }
+                }
+
+                System.out.println("distance: " + minimunDistance);
+                steps.clear();
+                for (Link link : shortestPath) {
+                    LinkedList<Node> tempList = link.getSteps();
+                    for (Node node : tempList) {
+                        steps.addLast(node);
+                    }
+                }
+                System.out.println(steps.size());
+                steps.removeFirst();
+                int rotation = interpreteStep(steps.removeFirst());
+                modifyCurrentState(rotation);
+                return rotation;
+
             }
 
         }
 
-        return -1;
+//        return -1;
     }
 
     private void stepOptions(boolean[] _Perception) {
@@ -226,10 +256,11 @@ public class InternalState {
         if (!memory.containsVertex(tempNode)) {
             memory.addVertex(tempNode);
         }
-        
+
+        updatePendingNodes(_Perception);
+
         //System.out.println("Paths: "+countPaths(_Perception));
         //System.out.println("agregar nodo: "+tempNode.toString()+"\nLink: \n"+currentLink.toString());
-
         if (currentLink.havePredecessor()) {
             currentLink.addStep(tempNode);
             memory.addEdge(new Link(currentLink), new Node(currentLink.getSource()), new Node(currentLink.getTarget()), EdgeType.DIRECTED);
@@ -245,30 +276,30 @@ public class InternalState {
     }
 
     private int interpreteStep(Node node) {
-        int east = (node.east+100) - (currentPosition.east+100);
-        int north = (node.north+100) - (currentPosition.north+100);
+        int east = (node.east + 100) - (currentPosition.east + 100);
+        int north = (node.north + 100) - (currentPosition.north + 100);
         int rotation = 0;
         boolean entro = false;
 
         if (east == 0 && north == 1) {
             rotation = 0;
-            entro=true;
+            entro = true;
         } else if (east == 1 && north == 0) {
-            entro=true;
+            entro = true;
             rotation = 1;
         } else if (east == 0 && north == -1) {
-            entro=true;
+            entro = true;
             rotation = 2;
         } else if (east == -1 && north == 0) {
-            entro=true;
+            entro = true;
             rotation = 3;
         }
-        if((rotation-orientation)<0){
-            rotation = rotation-orientation +4;
-        }else{
-            rotation = rotation-orientation;
+        if ((rotation - orientation) < 0) {
+            rotation = rotation - orientation + 4;
+        } else {
+            rotation = rotation - orientation;
         }
-        
+
         return rotation;
     }
 
@@ -292,8 +323,16 @@ public class InternalState {
         }
         return paths;
     }
-    
-    private boolean isNode(){
+
+    private boolean isNode() {
         return memory.containsVertex(new Node(currentPosition));
+    }
+
+    private void updatePendingNodes(boolean[] _Perception) {
+        stepOptions(_Perception);
+        if (options.size() < 1) {
+            nodePending.remove(new Node(currentPosition));
+        }
+        options.clear();
     }
 }

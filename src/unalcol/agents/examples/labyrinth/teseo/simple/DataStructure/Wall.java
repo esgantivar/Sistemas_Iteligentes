@@ -23,6 +23,25 @@ public class Wall {
         weastWall = _Perception[(_orientation + 3) % 4];
     }
 
+    public void setNorthWall(boolean northWall) {
+        this.northWall = northWall;
+    }
+
+    public void setSouthWall(boolean southWall) {
+        this.southWall = southWall;
+    }
+
+    public void setEastWall(boolean eastWall) {
+        this.eastWall = eastWall;
+    }
+
+    public void setWeastWall(boolean weastWall) {
+        this.weastWall = weastWall;
+    }
+    
+    
+
+
     public boolean isNorthWall() {
         return northWall;
     }
