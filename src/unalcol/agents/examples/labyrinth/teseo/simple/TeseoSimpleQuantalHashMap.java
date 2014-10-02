@@ -5,7 +5,9 @@
  */
 package unalcol.agents.examples.labyrinth.teseo.simple;
 
+import java.util.Scanner;
 import unalcol.agents.examples.labyrinth.teseo.simple.DataStructure.*;
+
 
 /**
  *
@@ -28,6 +30,7 @@ public class TeseoSimpleQuantalHashMap extends SimpleTeseoAgentProgram {
             return -1;
         }
         boolean[] p = {PF, PD, PA, PI};
-        return currentState.addPoint(p);
+        int s = currentState.addPoint(p);
+        return s;
     }
 }

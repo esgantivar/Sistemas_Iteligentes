@@ -15,7 +15,7 @@ import org.apache.commons.collections15.Transformer;
  * @author Quantal Team
  */
 public class InternalState {
-
+    Scanner sc =  new Scanner(System.in);
     private static InternalState instance;
     private Point currentPosition;
     private ArrayList<Point> pointsVisited;
@@ -129,11 +129,12 @@ public class InternalState {
     }
 
     public int addPoint(boolean[] _Perception) {
+        System.out.println("currentP: " + currentPosition.toString());
         if (!pointsVisited.contains(currentPosition)) {
             pointsVisited.add(new Point(currentPosition));
         }
 
-        /*     El Grafo esta vacio        */
+        /*-----El Grafo esta vacio--------*/
         if (memory.getVertexCount() == 0) {
             addNode(_Perception);
             int choice = simpleChoiceStep(_Perception);
@@ -142,21 +143,9 @@ public class InternalState {
         }
         /*--------------------------------*/
 
-        int paths = 0;
-
-        for (boolean b : _Perception) {
-            if (!b) {
-                paths += 1;
-            }
-        }
-        //Si la celda tiene mas de dos caminos es un nodo, si no es un paso
-        if (paths > 2) {
-            if (!new Node(currentPosition).equals(currentNode)) {
-                addNode(_Perception);
-            }else{
-                currentLink.clearSteps();
-                addStep(_Perception);
-            }
+        /*Si la celda tiene mas de dos caminos es un nodo, si no es un paso*/
+        if (countPaths(_Perception) > 2) {
+            addNode(_Perception);
         } else {
             if (currentLink.havePredecessor()) {
                 addStep(_Perception);
@@ -168,27 +157,34 @@ public class InternalState {
         if (!options.isEmpty()) {
             int rotation = options.remove((int) (Math.random() * options.size()));
             if (options.size() >= 1) {
-                nodePending.add(currentNode);
+                nodePending.add(new Node(currentNode));
             }
-            options.clear();
             modifyCurrentState(rotation);
             return rotation;
 
         } else { //No hay opciones de movimiento a celdas no exploradas
-
-            if (!memory.containsVertex(new Node(currentPosition))) {
-                if (steps.isEmpty()) {
-                    steps = new LinkedList(currentLink.getInverseSteps().getSteps());
-                    currentLink.clearSteps();
+            if(isNode()){
+                System.out.println("calcular Dijstra");
+                
+                sc.next();
+            }else{
+                /*El agente esta en un paso*/
+                if(steps.isEmpty()){
+                     steps = new LinkedList(currentLink.getInverseSteps().getSteps());
+                     steps.removeFirst();
+                     currentLink.clearSteps();
                 }
-                steps.remove(new Node(currentPosition, _Perception, orientation));
-
-                Node nodeTemp = steps.getFirst();
-                steps.remove(nodeTemp);
-                return interpreteStep(nodeTemp);
-            } else {
-                //el agente ya se encuentra en un nodo, ahora calcular la distancia mas corta
-                System.out.println("ñero llegue a un nodo");
+                System.out.println("+++++++++++++++++++");
+                for (Node b : steps) {
+                    System.out.println(b.toString());
+                }
+                System.out.println("+++++++++++++++++++");
+                
+                int rotation = interpreteStep(steps.removeFirst());
+                modifyCurrentState(rotation);
+                
+                
+                return rotation;
             }
 
         }
@@ -197,7 +193,7 @@ public class InternalState {
     }
 
     private void stepOptions(boolean[] _Perception) {
-
+        options.clear();
         if (!_Perception[0] && alreadyVisited(0)) {
             options.add(0);
         }
@@ -230,20 +226,18 @@ public class InternalState {
         if (!memory.containsVertex(tempNode)) {
             memory.addVertex(tempNode);
         }
-
-        currentLink.addStep(tempNode);
-        for (Node b : currentLink.getSteps()) {
-            System.out.println(b.toString());
-        }
-        System.out.println("************************");
-        currentNode = new Node(tempNode);
+        
+        //System.out.println("Paths: "+countPaths(_Perception));
+        //System.out.println("agregar nodo: "+tempNode.toString()+"\nLink: \n"+currentLink.toString());
 
         if (currentLink.havePredecessor()) {
-            memory.addEdge(new Link(currentLink), new Node(currentNode), new Node(tempNode), EdgeType.DIRECTED);
-            memory.addEdge(new Link(currentLink.getInverseSteps()), new Node(tempNode), new Node(currentNode), EdgeType.DIRECTED);
-            currentLink.clearSteps();
+            currentLink.addStep(tempNode);
+            memory.addEdge(new Link(currentLink), new Node(currentLink.getSource()), new Node(currentLink.getTarget()), EdgeType.DIRECTED);
+            memory.addEdge(new Link(currentLink.getInverseSteps()), new Node(currentLink.getInverseSteps().getSource()), new Node(currentLink.getInverseSteps().getTarget()), EdgeType.DIRECTED);
+            currentLink.resetLink();
         }
-        currentLink.addPredecessor(tempNode);
+        currentNode = new Node(tempNode);
+        currentLink.addPredecessor(new Node(currentNode));
     }
 
     private void addStep(boolean[] _Perception) {
@@ -251,20 +245,31 @@ public class InternalState {
     }
 
     private int interpreteStep(Node node) {
-        int east = node.east - currentPosition.east;
-        int north = node.north - currentPosition.north;
+        int east = (node.east+100) - (currentPosition.east+100);
+        int north = (node.north+100) - (currentPosition.north+100);
         int rotation = 0;
+        boolean entro = false;
 
         if (east == 0 && north == 1) {
             rotation = 0;
+            entro=true;
         } else if (east == 1 && north == 0) {
+            entro=true;
             rotation = 1;
         } else if (east == 0 && north == -1) {
+            entro=true;
             rotation = 2;
         } else if (east == -1 && north == 0) {
+            entro=true;
             rotation = 3;
         }
-        return (rotation + orientation) % 4;
+        if((rotation-orientation)<0){
+            rotation = rotation-orientation +4;
+        }else{
+            rotation = rotation-orientation;
+        }
+        
+        return rotation;
     }
 
     public void print(boolean[] _p) {
@@ -276,5 +281,19 @@ public class InternalState {
          System.out.print(" PA: "+_p[2]);
          System.out.print(" PI: "+_p[3]+"\n");*/
 
+    }
+
+    private int countPaths(boolean[] _Perception) {
+        int paths = 0;
+        for (boolean b : _Perception) {
+            if (!b) {
+                paths += 1;
+            }
+        }
+        return paths;
+    }
+    
+    private boolean isNode(){
+        return memory.containsVertex(new Node(currentPosition));
     }
 }

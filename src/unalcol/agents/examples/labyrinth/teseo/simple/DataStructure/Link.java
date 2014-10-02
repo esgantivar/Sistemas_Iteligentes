@@ -52,6 +52,10 @@ public class Link {
     public void clearSteps() {
         steps.clear();
     }
+    public void resetLink(){
+        steps.clear();
+        havePredecessor = false;
+    }
 
     public Link getInverseSteps() {
         Link inverseLink = new Link();
@@ -75,6 +79,11 @@ public class Link {
 
     @Override
     public String toString() {
-        return "From: " + steps.getFirst() + ", To: " + steps.getLast();
+        String s = "[";
+        for (Node node : steps) {
+            s+=node.toString()+",\n";
+        }
+        s = s.substring(0, s.length()-2)+ "]\n*******************************";
+        return "*******************************\n"+"From: " + steps.getFirst() + ", To: " + steps.getLast()+"\nLos pasos son: \n"+s;
     }
 }
