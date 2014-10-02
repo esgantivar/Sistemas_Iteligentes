@@ -1,4 +1,4 @@
-package unalcol.agents.examples.labyrinth.teseo.simple;
+package unalcol.agents.examples.labyrinth.teseo.multi;
 
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Graph;
@@ -6,10 +6,10 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeseoMultiQuantalGraph extends SimpleTeseoAgentProgram {
+public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
 
     @Override
-    public int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT) {
+    public int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT, boolean AF, boolean AD, boolean AA, boolean AI) {
         //-1: no hace nada
         //0: avanza
         //1: 1 giro a la derecha y avanza
@@ -17,6 +17,11 @@ public class TeseoMultiQuantalGraph extends SimpleTeseoAgentProgram {
         //3: 3 giros a la derecha y avanza
 
         if (MT) { // encontrar la meta
+            return -1;
+        }
+        
+        if (AF || AD || AA || AI) { // si hay un agente cercano
+            System.out.println("he detectado un agente!");
             return -1;
         }
 
@@ -75,7 +80,7 @@ public class TeseoMultiQuantalGraph extends SimpleTeseoAgentProgram {
             //////////////////////////////////////////////////////////////////////////////////
 
             crearCamino(listaRutaCorta);
-            return accion(PF, PD, PA, PI, MT);
+            return accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
         }
 
         if (opciones.size() > 1) {
