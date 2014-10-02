@@ -6,7 +6,7 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeseoSimpleQuantalGraph extends SimpleTeseoAgentProgram {
+public class TeseoMultiQuantalGraph extends SimpleTeseoAgentProgram {
 
     @Override
     public int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT) {

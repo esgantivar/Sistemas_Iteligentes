@@ -18,7 +18,8 @@ public class TeseoMain {
         // InteractiveAgentProgram p = new InteractiveAgentProgram( getLanguage() );
         //TeseoSimple p = new TeseoSimple();
         // RandomReflexTeseo p = new RandomReflexTeseo();
-        TeseoSimpleQuantalHashMap p = new TeseoSimpleQuantalHashMap();
+        TeseoSimpleQuantalGraph p = new TeseoSimpleQuantalGraph();
+//        TeseoSimpleQuantalHashMap p = new TeseoSimpleQuantalHashMap();
         p.setLanguage(getLanguage());
         LabyrinthDrawer.DRAW_AREA_SIZE = 600;
         LabyrinthDrawer.CELL_SIZE = 40;

@@ -8,6 +8,8 @@ import unalcol.agents.Agent;
 import unalcol.agents.AgentProgram;
 import unalcol.agents.examples.labyrinth.Labyrinth;
 import unalcol.agents.examples.labyrinth.LabyrinthDrawer;
+import unalcol.agents.examples.labyrinth.teseo.simple.TeseoSimpleQuantalGraph;
+import unalcol.agents.examples.labyrinth.teseo.simple.TeseoSimpleQuantalHashMap;
 import unalcol.agents.simulate.util.SimpleLanguage;
 import unalcol.types.collection.vector.Vector;
 
@@ -22,6 +24,15 @@ public class MultiTeseoMain {
 
   public static void main( String[] argv ){
      AgentProgram[] teseo = new AgentProgram[12];
+     
+     // Agente Antiguo 
+     teseo[0] = new TeseoSimpleQuantalGraph();
+     ((TeseoSimpleQuantalGraph)teseo[0]).setLanguage(getLanguage());
+     
+     // Agente Experimental
+     teseo[1] = new TeseoSimpleQuantalGraph();
+     ((TeseoSimpleQuantalGraph)teseo[1]).setLanguage(getLanguage());
+     
      /* Equipo: Perceptron * /
      teseo[0] = new SimpleTeseoAgentProgramPerceptron();
      ((SimpleTeseoAgentProgramPerceptron)teseo[0]).setLanguage(getLanguage());
@@ -52,8 +63,8 @@ public class MultiTeseoMain {
      teseo[10] = new TesoCai();
      ((TesoCai)teseo[10]).setLanguage(getLanguage());                              
     */  
-    int index1 = 10;
-    int index2 = 4;
+    int index1 = 0;
+    int index2 = 1;
     
     LabyrinthDrawer.DRAW_AREA_SIZE = 600;
     LabyrinthDrawer.CELL_SIZE = 40;
