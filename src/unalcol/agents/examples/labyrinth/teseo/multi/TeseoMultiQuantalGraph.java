@@ -47,10 +47,9 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
             opciones.add(3);
         }
 
-        //si no hay opciones de desplazamiento, reinicialize
+        //si no hay opciones de desplazamiento, quedarse quieto
         if (opciones.isEmpty()) {
             if (nodosPendientes.isEmpty()) {
-//                reiniciar();
                 return -1;
             }
 
@@ -62,11 +61,11 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
             int indice = -1;
 
             for (int a = 0; a < nodosPendientes.size(); a++) {
-                //en el caso de que el grafo no tenga problemas
                 try{
+                    //en el caso de que el grafo no tenga problemas, busque la ruta corta
                     listaRutaCortaTemporal = rutaCorta.getPath(fila + "/" + columna, nodosPendientes.get(a));
                 }catch(IllegalArgumentException e){
-                    // si hay problemas con el grafo, se reinicializa
+                    // si hay problemas con el grafo, el agente se reinicializa
                     reiniciar();
                     return -1;
                 }
@@ -83,8 +82,6 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
 
             crearCamino(listaRutaCorta);
             return accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
-//            return -1;
-//            return accion(PF, PD, PA, PI, MT);
         }
 
         if (opciones.size() > 1) {
@@ -92,10 +89,15 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
         } else {
             nodosPendientes.remove(fila + "/" + columna);
         }
+        
         //entre las opciones disponibles, elige una de manera aleatoria
         int numeroAccion = opciones.get((int) (Math.random() * (opciones.size())));
 
-        // si hay un agente enfrente, revisar
+        // si hay un agente enfrente, quedarse quieto
+        // en el caso de que lo encuentre enfrente mas de 6 veces
+        // el agente se reinicializa
+        
+        // NOTA: esto tal vez se pueda mejorar (ejemplo: buscar un nodo pendiente)
         if ((numeroAccion==0&&AF)||(numeroAccion==1&&AD)||(numeroAccion==2&&AA)||(numeroAccion==3&&AI)){ 
             if(contador==6){
                 reiniciar();
@@ -157,6 +159,8 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
         }
         if (!grafo.containsVertex(nodoTemporal)) {
             grafo.addVertex(nodoTemporal);
+            // ya que se crea un vertice, reinicializar el contador 
+            // (porque el agente se esta moviendo)
             contador = 0;
         }
 
@@ -184,14 +188,11 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
         String[] arrayDeNodos;
         String nodo1;
         String nodo2;
-        for (int a = 0; a < listaRutaCorta.size(); a++) {
-            enlace = listaRutaCorta.get(a);
+        for (String listaRutaCorta1 : listaRutaCorta) {
+            enlace = listaRutaCorta1;
             arrayDeNodos = enlace.split("&");
-            //nodo1 = arrayDeNodos[0].substring(1, arrayDeNodos[0].length());
             nodo1 = arrayDeNodos[0].substring(1, arrayDeNodos[0].length());
-            //nodo2 = arrayDeNodos[1].substring(0, arrayDeNodos[1].length() - 1);
             nodo2 = arrayDeNodos[1].substring(0, arrayDeNodos[1].length() - 1);
-
             grafo.removeEdge(enlace);
             grafo.removeVertex(nodo1);
             grafo.removeVertex(nodo2);
