@@ -10,20 +10,14 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
 
     @Override
     public int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT, boolean AF, boolean AD, boolean AA, boolean AI) {
+//    public int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT) {
         //-1: no hace nada
         //0: avanza
         //1: 1 giro a la derecha y avanza
         //2: 2 giros a la derecha y avanza
         //3: 3 giros a la derecha y avanza
 
-        if (MT) { // encontrar la meta
-            return -1;
-        }
-        
-        if (AF || AD || AA || AI) { // si hay un agente cercano
-            System.out.println("he detectado un agente!");
-            return -1;
-        }
+        if (MT) return -1;  // encontrar la meta      
 
         //el nodo en donde se encuentra el agente no puede pertenecer a nodosPendientes
         if (nodosPendientes.contains(fila + "/" + columna)) {
@@ -53,9 +47,10 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
             opciones.add(3);
         }
 
-        //si no hay opciones de desplazamiento, buscar nodos pendientes
+        //si no hay opciones de desplazamiento, reinicialize
         if (opciones.isEmpty()) {
             if (nodosPendientes.isEmpty()) {
+//                reiniciar();
                 return -1;
             }
 
@@ -67,7 +62,14 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
             int indice = -1;
 
             for (int a = 0; a < nodosPendientes.size(); a++) {
-                listaRutaCortaTemporal = rutaCorta.getPath(fila + "/" + columna, nodosPendientes.get(a));
+                //en el caso de que el grafo no tenga problemas
+                try{
+                    listaRutaCortaTemporal = rutaCorta.getPath(fila + "/" + columna, nodosPendientes.get(a));
+                }catch(IllegalArgumentException e){
+                    // si hay problemas con el grafo, se reinicializa
+                    reiniciar();
+                    return -1;
+                }
                 if (listaRutaCortaTemporal.size() < longitudMinima) {
                     longitudMinima = listaRutaCortaTemporal.size();
                     indice = a;
@@ -81,6 +83,8 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
 
             crearCamino(listaRutaCorta);
             return accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
+//            return -1;
+//            return accion(PF, PD, PA, PI, MT);
         }
 
         if (opciones.size() > 1) {
@@ -91,6 +95,14 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
         //entre las opciones disponibles, elige una de manera aleatoria
         int numeroAccion = opciones.get((int) (Math.random() * (opciones.size())));
 
+        // si hay un agente enfrente, revisar
+        if ((numeroAccion==0&&AF)||(numeroAccion==1&&AD)||(numeroAccion==2&&AA)||(numeroAccion==3&&AI)){ 
+            if(contador==6){
+                reiniciar();
+            }
+            contador++;
+            return -1;
+        }
         //si se mueve, cambiar orientacion
         if (0 <= numeroAccion && numeroAccion <= 3) {
             int salida[] = cambiarOrientacion(orientacion, numeroAccion);
@@ -111,7 +123,16 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
     private int fila = 0;
     private int columna = 0;
     private int orientacion = 0;
+    private int contador = 0;
+    
 
+    private void reiniciar(){
+        fila = columna = orientacion = contador = 0;
+        grafo= new SparseMultigraph<>();
+        rutaCorta = new DijkstraShortestPath(grafo);
+        nodosPendientes = new ArrayList<>();
+        System.out.println("TeseoQuantal: memoria reiniciada");
+    }
     private int[] cambiarOrientacion(int orientacion2, int giro) {
         int[] salida = {0, fila, columna};
         salida[0] = (orientacion2 + giro) % 4;
@@ -136,6 +157,7 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
         }
         if (!grafo.containsVertex(nodoTemporal)) {
             grafo.addVertex(nodoTemporal);
+            contador = 0;
         }
 
         String nombre = "(" + nodoTemporal + "&" + nodoPrincipal + ")";

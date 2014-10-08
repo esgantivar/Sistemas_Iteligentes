@@ -9,6 +9,7 @@ import unalcol.agents.AgentProgram;
 import unalcol.agents.examples.labyrinth.Labyrinth;
 import unalcol.agents.examples.labyrinth.LabyrinthDrawer;
 import unalcol.agents.examples.labyrinth.teseo.multi.TeseoMultiQuantalGraph;
+import unalcol.agents.examples.labyrinth.teseo.simple.RandomReflexTeseo;
 import unalcol.agents.examples.labyrinth.teseo.simple.TeseoDeath;
 import unalcol.agents.simulate.util.SimpleLanguage;
 import unalcol.types.collection.vector.Vector;
@@ -24,14 +25,18 @@ public class MultiTeseoMain {
 
   public static void main( String[] argv ){
      AgentProgram[] teseo = new AgentProgram[12];
-     
-     // Agente Antiguo 
+      
+     // agente 1
      teseo[0] = new TeseoMultiQuantalGraph();
      ((TeseoMultiQuantalGraph)teseo[0]).setLanguage(getLanguage());
      
-     // Agente Experimental
-     teseo[1] = new TeseoDeath();
-     ((TeseoDeath)teseo[1]).setLanguage(getLanguage());
+     // agente 2
+//     teseo[1] = new TeseoDeath();
+//     ((TeseoDeath)teseo[1]).setLanguage(getLanguage());
+//     teseo[1] = new RandomReflexTeseo();
+//     ((RandomReflexTeseo)teseo[1]).setLanguage(getLanguage());
+     teseo[1] = new TeseoMultiQuantalGraph();
+     ((TeseoMultiQuantalGraph)teseo[1]).setLanguage(getLanguage());
      
      /* Equipo: Perceptron * /
      teseo[0] = new SimpleTeseoAgentProgramPerceptron();
@@ -70,8 +75,8 @@ public class MultiTeseoMain {
     LabyrinthDrawer.CELL_SIZE = 40;
     Labyrinth.DEFAULT_SIZE = 15;
     
-    Agent agent1 = new Agent(teseo[index1]);    
-    Agent agent2 = new Agent(teseo[index2]);
+    Agent agent1 = new Agent(teseo[index1]); //negro
+    Agent agent2 = new Agent(teseo[index2]); //azul
     
     //Agent agent3 = new Agent(p3);
     Vector<Agent> agent = new Vector();

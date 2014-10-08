@@ -23,6 +23,7 @@ public abstract class MultiTeseoAgentProgram implements AgentProgram {
     }
     // se agregan las percepciones de los otros agentes
     public abstract int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT, boolean AF, boolean AD, boolean AA, boolean AI);
+//    public abstract int accion(boolean PF, boolean PD, boolean PA, boolean PI, boolean MT);
 
     /**
      * execute
@@ -54,6 +55,7 @@ public abstract class MultiTeseoAgentProgram implements AgentProgram {
                     booleanValue();
 
             int d = accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
+//            int d = accion(PF, PD, PA, PI, MT);
             if (0 <= d && d < 4) {
                 for (int i = 1; i <= d; i++) {
                     cmd.add(language.getAction(3)); //rotate
