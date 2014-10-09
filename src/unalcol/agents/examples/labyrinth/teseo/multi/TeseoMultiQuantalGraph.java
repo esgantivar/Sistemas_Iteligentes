@@ -47,9 +47,11 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
             opciones.add(3);
         }
 
-        //si no hay opciones de desplazamiento, quedarse quieto
+        // si no hay opciones de desplazamiento, se buscaon nodos pendientes
         if (opciones.isEmpty()) {
+            //si no hay nodos pendientes, el agente se reinicia
             if (nodosPendientes.isEmpty()) {
+                reiniciar();
                 return -1;
             }
 
@@ -64,8 +66,8 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
                 try{
                     //en el caso de que el grafo no tenga problemas, busque la ruta corta
                     listaRutaCortaTemporal = rutaCorta.getPath(fila + "/" + columna, nodosPendientes.get(a));
-                }catch(IllegalArgumentException e){
-                    // si hay problemas con el grafo, el agente se reinicializa
+                }catch(Exception e){
+                    // si hay problemas con el grafo de cualquier tipo, el agente se reinicializa
                     reiniciar();
                     return -1;
                 }
@@ -81,7 +83,8 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
             //////////////////////////////////////////////////////////////////////////////////
 
             crearCamino(listaRutaCorta);
-            return accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
+//            return accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
+            return -1;
         }
 
         if (opciones.size() > 1) {
