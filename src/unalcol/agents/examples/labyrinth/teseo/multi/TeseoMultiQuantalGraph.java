@@ -84,6 +84,12 @@ public class TeseoMultiQuantalGraph extends MultiTeseoAgentProgram {
 
             crearCamino(listaRutaCorta);
 //            return accion(PF, PD, PA, PI, MT, AF, AD, AA, AI);
+            // no se si esto pueda funcionar, es para evitar que un agente
+            // se quede quieto
+            if(contador==6){
+                reiniciar();
+            }
+            contador++;
             return -1;
         }
 
