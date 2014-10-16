@@ -7,9 +7,17 @@ import java.util.ArrayList;
  *
  * @author Sneyder G
  */
-public class Queen {
+public class Queen{
     protected byte x;
     protected byte y;
+
+    public byte getY() {
+        return y;
+    }
+
+    public void setY(byte y) {
+        this.y = y;
+    }
 
     public Queen(byte _x, ArrayList<Byte> nQueens){
         x = _x;
@@ -37,6 +45,5 @@ public class Queen {
         }
         final Queen queen = (Queen) object;
         return (this.x== queen.x) && (this.y == queen.y);
-    }
-    
+    }    
 }
