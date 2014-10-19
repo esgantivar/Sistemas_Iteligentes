@@ -8,71 +8,69 @@ package NQueensQuantal.SimulatedAnnealing;
 public class SimulatedAnnealing {
 
     private final double temperaturaFinal;
-    private final double factorEnfriamiento; 
+    private final double factorEnfriamiento;
     private double temperatura;
 
-    public SimulatedAnnealing(double temperaturaInicial, double temperaturaFinal, double factorEnfriamiento){
+    public SimulatedAnnealing(double temperaturaInicial, double temperaturaFinal, double factorEnfriamiento) {
         this.temperaturaFinal = temperaturaFinal;
         temperatura = temperaturaInicial;
         this.factorEnfriamiento = factorEnfriamiento;
     }
-    
-    public boolean funcionProbabilidad(double temperatura, double delta) {
-        if (delta < 0) return true;
-        
+
+    public boolean funcionTemplado(double temperatura, double delta) {
+        if (delta < 0) {
+            return true;
+        }
+
         // distribucion de Boltzmann
         double C = Math.exp(-delta / temperatura);
         double R = Math.random();
-       
-//        System.out.print(R < C);
-//        System.out.println(" C:"+C+" R:"+R+"\ntemperatura:"+temperatura+" delta:"+delta);
+
         return R < C;
     }
 
-    public void calcularSimulatedAnnealing(byte nQueens){        
+    public void calcularSimulatedAnnealing(byte nQueens) {
         Tablero tablero = new Tablero((byte) nQueens);
-        Tablero nuevoTablero;
-                
-        while (temperatura > temperaturaFinal) {
-            
-            nuevoTablero = (Tablero) tablero.clone();
-            
-            //calcular los valores de los costos y actualizar la solucion optima
 
-//            System.out.println("tableroN1:");
-//            System.out.println(nuevoTablero.printTable());
+        int iteraciones = 0;
+        while (temperatura > temperaturaFinal) {
+
+            //calcular los valores de los costos y actualizar la solucion optima
             
-            nuevoTablero.cambiar(temperatura, temperaturaFinal);
+//            System.out.println("tableroN1:");
+//            System.out.println(tablero.printTable());
+                        
+            //calcular el numero de conflictos del tablero
             int conflictos = tablero.evaluarConflictos();
+
+            // si no hay conflictos se ha terminado el problema
+            if (conflictos == 0) {
+                System.out.println("solucion encontrada, iteraciones: "+iteraciones);
+                break;
+            }
+            
+            //cambiar el tablero actual y calcular los conflictos del nuevo
+            int columna = tablero.columnaAleatoria();
+            byte fila = tablero.filaAleatoria(columna);
+            byte filaOriginal = tablero.filaOriginal(columna);
+            tablero.cambiar(fila, columna);
+            int conflictos2 = tablero.evaluarConflictos();
+            
             
 //            System.out.println("tableroN2:");
-//            System.out.println(nuevoTablero.printTable());
-            
-            // si no hay conflictos se ha terminado el problema
-            if (conflictos==0) {
-                System.out.println("solucion encontrada");
-                break;
-            }            
-            
-            //ERROR: la clonacion de objetos no es profunda al calcular delta
-            //esto genera que siempre sea igual a 0
-            int delta = nuevoTablero.evaluarConflictos() - conflictos;
-            
-            System.out.println(delta);
-//            System.out.println("conf t:"+conflictos+", conf tn:"+(conflictos-delta));
-//            System.out.println("tablero:");
 //            System.out.println(tablero.printTable());
-//            System.out.println("tablero nuevo:");
-//            System.out.println(nuevoTablero.printTable());
-            
-            if(funcionProbabilidad(temperatura, delta)){
-                tablero = (Tablero) nuevoTablero.clone();
+
+            int delta = conflictos2 - conflictos;
+
+//            System.out.println("conf t:"+conflictos+", conf tn:"+(conflictos2)+", delta:"+delta);
+
+            if (!funcionTemplado(temperatura, delta)) {
+                tablero.cambiar(filaOriginal, columna);
             }
-//            System.out.println("tablero:");
-//            System.out.println(tablero.printTable());
             temperatura = temperatura * factorEnfriamiento;
+            iteraciones++;
 //            System.out.println(temperatura);
         }
     }
-    
+
 }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author Cesar Galvis
  */
-public class Tablero implements Cloneable{
+public class Tablero{
     private Queen[] queens;
 
     public void setQueens(Queen[] queens) {
@@ -51,19 +51,21 @@ public class Tablero implements Cloneable{
         return conflicto;
     }
     
-    public void cambiar(double temperatura, double temperaturaFinal) {
-//        int rango = ((int) (temperatura/temperaturaFinal))*queens.length;
-        int index = (int) (queens.length * Math.random());
-        
-//        byte value = (byte) (rango * Math.random());
-//        if (value<0){ 
-//            value = (byte) (value*(-1));
-//        }
-//        
-//        queens[index].setY(value);
-//        evaluarConflictos();
-        byte value = (byte) (queens.length * Math.random() + 1);
-        queens[index].setY(value);
+    public int columnaAleatoria(){
+        return (int) (queens.length * Math.random());
+    }
+    public byte filaAleatoria(int columna){
+        byte filAl = (byte) (queens.length * Math.random() + 1);
+        while(filAl == filaOriginal(columna))
+            filAl = (byte) (queens.length * Math.random() + 1);
+        return filAl;
+    }
+    public byte filaOriginal(int columna){
+        return queens[columna].getY();
+    }
+    
+    public void cambiar(byte  fila, int columna){
+        queens[columna].setY(fila);
     }
     
     public String printTable() {
@@ -80,20 +82,5 @@ public class Tablero implements Cloneable{
             t += "\n";
         }
         return t + "conflictos: " + evaluarConflictos();
-    }
-    
-    @Override
-    public Object clone(){
-        Object clone = null;
-        try
-        {
-            clone = super.clone();
-        } 
-        catch(CloneNotSupportedException e)
-        {
-            // No deberia ocurrir
-        }
-        ((Tablero)clone).setQueens((Queen[])queens.clone());
-        return clone;
     }
 }

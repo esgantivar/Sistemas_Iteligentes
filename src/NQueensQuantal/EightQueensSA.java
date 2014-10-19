@@ -16,12 +16,13 @@ public class EightQueensSA {
 
     public static void main(String[] args) {
         // parametros templado simulado
-        double temperaturaInicial = 35;
+        double temperaturaInicial = 45;
         double temperaturaFinal = 0; 
-        double factorEnfriamiento = 0.05;
-        byte nQueens = 8;
+        double factorEnfriamiento = 0.6;
+        byte nQueens = 100;
         SimulatedAnnealing sA = new SimulatedAnnealing(temperaturaInicial, temperaturaFinal, factorEnfriamiento);
         
+        System.out.println("ejecutando templado simulado...");
         sA.calcularSimulatedAnnealing(nQueens);
 
     }
