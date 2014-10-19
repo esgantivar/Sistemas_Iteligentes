@@ -22,8 +22,9 @@ public class EightQueensSA {
         byte nQueens = 100;
         SimulatedAnnealing sA = new SimulatedAnnealing(temperaturaInicial, temperaturaFinal, factorEnfriamiento);
         
+        System.out.println("numero de reinas: "+nQueens);
         System.out.println("ejecutando templado simulado...");
         sA.calcularSimulatedAnnealing(nQueens);
-
+        System.out.println("programa terminado");
     }
 }
