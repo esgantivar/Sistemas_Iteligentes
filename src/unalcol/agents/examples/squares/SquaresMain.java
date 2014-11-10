@@ -16,7 +16,7 @@ public class SquaresMain  {
   public static void main( String[] argv ){
     // Reflection
     //ServiceProvider provider = ReflectUtil.getProvider("services/");
-    Agent w_agent = new Agent( new DummySquaresAgentProgram( Squares.WHITE ));
+    Agent w_agent = new Agent( new QuantalSquare( Squares.WHITE ));
     Agent b_agent =  new Agent( new DummySquaresAgentProgram( Squares.BLACK ));
     //Agent b_agent = new Agent( new ReversiSinGrupoAPv2(Reversi.BLACK) );
     //Agent w_agent = new Agent( new NoTanDummiReversiAgentProgram(Reversi.WHITE) );

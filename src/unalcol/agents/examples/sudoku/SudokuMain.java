@@ -14,7 +14,7 @@ public class SudokuMain {
 
   public static void main( String[] argv ){
     // Reflection
-    ServiceProvider provider = ReflectUtil.getProvider("services/");
+    //ServiceProvider provider = ReflectUtil.getProvider("services/");
     //    Agent agent = new Agent( new InteractiveAgentProgram( getLanguage() ) );
     Agent agent = new Agent( new NaiveSudokuAgentProgram() );
     SudokuMainFrame frame = new SudokuMainFrame( agent, getLanguage() );

@@ -47,9 +47,11 @@ public class Board {
              val<=0 || val>BOTTOM || (values[i][j] & val) == val;
     }
     
+    /*WHITE al ser igual a 6 (10000) no retorna el entero 4, ya que
+    las ultimas 4 cifras en binario deben ser unos (*1111)*/
     protected int lines(int i, int j){
       int c=(values[i][j] & LEFT)==LEFT?1:0;
-      c+=(values[i][j] & TOP)==TOP?1:0;
+      c+=(values[i][j] & TOP)==TOP?1:0; 
       c+=(values[i][j] & RIGHT)==RIGHT?1:0;
       c+=(values[i][j] & BOTTOM)==BOTTOM?1:0;
       return c;
@@ -180,6 +182,9 @@ public class Board {
               ci += CELL_SIZE;
           }
     }
+    
+    /*aqui parece haber un error, cuando encuentra una casilla 16 (WHITE) la 
+    funcion lines cuenta 0 lineas pero deben ser 4*/
     
     public int white_count(){
        int c=0;
