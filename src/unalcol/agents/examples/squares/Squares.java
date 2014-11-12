@@ -97,6 +97,10 @@ public class Squares extends Environment{
             }
         }
         String[] code = action.getCode().split(":");
+//        System.out.println(code[0]);
+//        System.out.println(code[1]);
+//        System.out.println(code[2]);
+//        System.out.println("-----------------");
         int i = Integer.parseInt(code[0]);
         int j = Integer.parseInt(code[1]);
         int side = 0;

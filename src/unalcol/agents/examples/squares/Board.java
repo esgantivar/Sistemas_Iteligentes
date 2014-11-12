@@ -17,7 +17,8 @@ public class Board {
     protected static final int TOP = 2;
     protected static final int RIGHT = 4;
     protected static final int BOTTOM = 8;
-    protected static final int WHITE = 16;
+    protected static final int WHITE = 31;
+//    protected static final int WHITE = 16;
     
     protected int[][] values;
     
