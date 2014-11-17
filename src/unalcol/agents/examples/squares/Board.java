@@ -17,8 +17,8 @@ public class Board {
     protected static final int TOP = 2;
     protected static final int RIGHT = 4;
     protected static final int BOTTOM = 8;
-    protected static final int WHITE = 31;
-//    protected static final int WHITE = 16;
+//    protected static final int WHITE = 31;
+    protected static final int WHITE = 16;
     
     protected int[][] values;
     
@@ -48,7 +48,7 @@ public class Board {
              val<=0 || val>BOTTOM || (values[i][j] & val) == val;
     }
     
-    /*WHITE al ser igual a 6 (10000) no retorna el entero 4, ya que
+    /*WHITE al ser igual a 16 (10000) no retorna el entero 4, ya que
     las ultimas 4 cifras en binario deben ser unos (*1111)*/
     protected int lines(int i, int j){
       int c=(values[i][j] & LEFT)==LEFT?1:0;

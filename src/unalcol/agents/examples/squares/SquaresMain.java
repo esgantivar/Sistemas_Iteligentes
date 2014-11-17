@@ -25,7 +25,8 @@ public class SquaresMain {
         //color blanco, pero al empezar de segundas con negro no funciona correctamente
         
         Agent w_agent = new Agent(new QuantalSquare(Squares.WHITE));
-        Agent b_agent = new Agent(new DummySquaresAgentProgram(Squares.BLACK));
+        Agent b_agent = new Agent(new QuantalSquare(Squares.BLACK));
+//        Agent b_agent = new Agent(new DummySquaresAgentProgram(Squares.BLACK));
         //Agent b_agent = new Agent( new ReversiSinGrupoAPv2(Reversi.BLACK) );
         //Agent w_agent = new Agent( new NoTanDummiReversiAgentProgram(Reversi.WHITE) );
         SquaresMainFrame frame = new SquaresMainFrame(w_agent, b_agent);

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import unalcol.agents.Action;
 import unalcol.agents.AgentProgram;
 import unalcol.agents.Percept;
-import unalcol.types.collection.vector.Vector;
+import static unalcol.agents.examples.squares.Board.*;
 
 /**
  *
@@ -65,7 +65,10 @@ public class QuantalSquare implements AgentProgram {
         while(arbol.mejorDireccion==0){
 //            if(size != Integer.parseInt((String) p.getAttribute(Squares.SIZE)))
 //                size = Integer.parseInt((String) p.getAttribute(Squares.SIZE));
-            movMiniMax(arbol, white);
+//            movMiniMax(arbol, white);
+            
+//            System.out.println(alfaBeta(arbol, white, - (int) Double.POSITIVE_INFINITY, (int) Double.POSITIVE_INFINITY));
+            alfaBeta(arbol, white, - (int) Double.POSITIVE_INFINITY, (int) Double.POSITIVE_INFINITY);
         }
         
         String result="";
@@ -82,38 +85,79 @@ public class QuantalSquare implements AgentProgram {
             case 8:
             result="bottom";
             break;
-        } 
-//        System.out.println("movimiento: "+arbol.mejorMovimientoI + ":" + arbol.mejorMovimientoJ + ":" + result);
+        }
+        System.out.println("color: "+color+" movimiento: "+arbol.mejorMovimientoI + ":" + arbol.mejorMovimientoJ + ":" + result);
+//        impVal(arbol.tablero.values);
         return new Action(arbol.mejorMovimientoI + ":" + arbol.mejorMovimientoJ + ":" + result);
     }
 
     /* Metodo recursivo, que genera los nodos con los movimientos. */
-    public void movMiniMax(NodoG raiz, boolean white) {
-
-        //se verifica si hay un ganador
-        int ganador = resultado(raiz.tablero);
-
-        //se guardan las posibles jugadas que se pueden realizar con el tablero
-        //de la raiz
-        raiz.nodos = buscarHijos(white, raiz.tablero);
+//    public void movMiniMax(NodoG raiz, boolean white) {
+//
+//        //se verifica si hay un ganador
+//        int ganador = resultado(raiz.tablero, white);
+//
+//        //se guardan las posibles jugadas que se pueden realizar con el tablero
+//        //de la raiz
+//        raiz.nodos = buscarHijos(white, raiz.tablero);
+//        
+//        if (ganador != 0 || raiz.nodos.length == 0) {
+//            raiz.ganador = ganador;
+//        } else {
+//
+//            //Creamos los datos de cada hijo
+//            for (int i = 0; i < raiz.nodos.length; i++) {
+//                //Cambiamos el turno de los hijos
+//                raiz.nodos[i].miTurno = !raiz.miTurno;
+//                
+//                movMiniMax(raiz.nodos[i], !white);
+//            }
+//
+//            // Minimax
+//            if (!raiz.miTurno) {
+//                raiz.ganador = Max(raiz);
+//            } else {
+//                raiz.ganador = Min(raiz);
+//            }
+//        }
+//    }
+    
+    public int alfaBeta(NodoG raiz, boolean white, int alfa, int beta){
         
-        if (ganador != 0 || raiz.nodos.length == 0) {
+        //se verifica si hay un ganador
+        int ganador = resultado(raiz.tablero,white,raiz.miTurno);
+        
+        if (ganador != 0) {
+//            impVal(raiz.tablero.values);
+//            System.out.println("ganador: "+ganador+", mi turno:"+raiz.miTurno); 
             raiz.ganador = ganador;
+            return ganador;
         } else {
-
-            //Creamos los datos de cada hijo
-            for (int i = 0; i < raiz.nodos.length; i++) {
-                //Cambiamos el turno de los hijos
-                raiz.nodos[i].miTurno = !raiz.miTurno;
-                
-                movMiniMax(raiz.nodos[i], !white);
-            }
-
-            // Minimax
-            if (!raiz.miTurno) {
+            
+            //se guardan las posibles jugadas que se pueden realizar con el tablero
+            //de la raiz
+            raiz.nodos = buscarHijos(white, raiz.tablero);
+            
+            if (raiz.miTurno) {
+                for (int i = 0; i < raiz.nodos.length; i++) {
+                    raiz.nodos[i].miTurno = !raiz.miTurno;
+                    alfa = Math.max(alfa, alfaBeta(raiz.nodos[i], !white, alfa, beta));
+                    if(beta<=alfa)
+                        break;
+                }
+//                raiz.ganador = alfa;
                 raiz.ganador = Max(raiz);
+                return alfa;
             } else {
+                for (int i = 0; i < raiz.nodos.length; i++) {
+                    raiz.nodos[i].miTurno = !raiz.miTurno;
+                    beta = Math.min(alfa, alfaBeta(raiz.nodos[i], !white, alfa, beta));
+                    if(beta<=alfa)
+                        break;
+                }
+//                raiz.ganador = beta;
                 raiz.ganador = Min(raiz);
+                return beta;
             }
         }
     }
@@ -224,6 +268,7 @@ public class QuantalSquare implements AgentProgram {
 //        System.out.println(white+"-"+ fil+"-"+  col+"-"+  direccion);
         tablTemp.play(white, fil, col, direccion);
 //        if(!white) parche(tablTemp);
+        parche(tablTemp);
         if (!duplicado(listaTableros, tablTemp.values)) {
             listaTableros.add(tablTemp);
             ies.add(fil);
@@ -233,7 +278,7 @@ public class QuantalSquare implements AgentProgram {
     }
 
     //imprime una matriz de valores
-    public void impVal(int[][] val) {
+    public static void impVal(int[][] val) {
         for (int[] val1 : val) {
             for (int b = 0; b < val.length; b++) {
                 System.out.print(val1[b] + " ");
@@ -262,17 +307,17 @@ public class QuantalSquare implements AgentProgram {
         return false;
     }
 
-    //parche para solucionar el problema de las casillas con valor 31
+    
     //no es un buen metodo de programación pero es para ver si funciona
-//    public void parche(Board tablero){
-//        int x=tablero.values.length;
-//        for (int a = 0; a < x; a++) {
-//            for (int b = 0; b < x; b++) {
-//                if (tablero.values[a][b]==31)
-//                    tablero.values[a][b]=16;
-//            }
-//        }
-//    }
+    public void parche(Board tablero){
+        int x=tablero.values.length;
+        for (int a = 0; a < x; a++) {
+            for (int b = 0; b < x; b++) {
+                if (tablero.values[a][b]==16)
+                    tablero.values[a][b]=31;
+            }
+        }
+    }
     //verifica que el tablero este lleno (el del profe parece no funcionar por 
     //no leer los cuadros blancos)
 //    public boolean full(Board tablero) {
@@ -281,18 +326,29 @@ public class QuantalSquare implements AgentProgram {
 
     //retorna 0 si no se ha completado el juego y el numero de casillas obtenidas
     //por el jugador activo
-    public int resultado(Board tablero) {
+    public int resultado(Board tablero,boolean white, boolean miTurno) {
         if (!tablero.full()) {
             return 0;
         }
 //        if (!full(tablero)) {
 //            return 0;
 //        }
-        if (color.equals(Squares.WHITE)) {
+        if (white) {
 //            return white_count(tablero);
-            return tablero.white_count();
+            int nWhite =tablero.white_count();
+            if(miTurno)
+                return nWhite;
+            return -nWhite;
         }
-        return tablero.black_count();
+        int nBlack = tablero.black_count();
+        if(miTurno)
+            return nBlack;
+        return -nBlack;
+//        if (color.equals(Squares.WHITE)) {
+////            return white_count(tablero);
+//            return tablero.white_count();
+//        }
+//        return tablero.black_count();
     }
     /*Método que calcula el MÁXIMO de los nodos hijos de MIN*/
 
@@ -301,16 +357,16 @@ public class QuantalSquare implements AgentProgram {
         /*Máximo para la computadora, buscamos el valor donde gane.*/
         for (int i = 0; i < raiz.nodos.length; i++) {
             /*Preguntamos por un nodo con un valor alto MAX*/
-            if (raiz.nodos[i].ganador > Max) {
+            if (raiz.nodos[i].ganador > Max && raiz.nodos[i].ganador!=0) {
                 /*Lo asignamos y pasamos el mejor movimiento a la raíz.*/
                 Max = raiz.nodos[i].ganador;
                 raiz.mejorMovimientoI = raiz.nodos[i].i;
                 raiz.mejorMovimientoJ = raiz.nodos[i].j;
                 raiz.mejorDireccion = raiz.nodos[i].direccion;
                 /*Terminamos de buscar.*/
-                if (Max == 1) {
-                    break;
-                }
+//                if (Max == 1) {
+//                    break;
+//                }
             }
         }
         /*Borramos los nodos.*/
@@ -323,21 +379,44 @@ public class QuantalSquare implements AgentProgram {
         int Min = (int) Double.POSITIVE_INFINITY;
         /*Mínimo para el jugador*/
         for (int i = 0; i < raiz.nodos.length; i++) {
-            if (raiz.nodos[i].ganador < Min) {
+            if (raiz.nodos[i].ganador < Min && raiz.nodos[i].ganador!=0) {
                 Min = raiz.nodos[i].ganador;
                 raiz.mejorMovimientoI = raiz.nodos[i].i;
                 raiz.mejorMovimientoJ = raiz.nodos[i].j;
                 raiz.mejorDireccion = raiz.nodos[i].direccion;
-                if (Min == -1) {
-                    break;
-                }
+//                if (Min == -1) {
+//                    break;
+//                }
             }
         }
         /*Borramos los nodos.*/
         raiz.nodos = null;
         return Min;
+        
     }
-
+    
+    public static void main( String[] args ){
+        Board b = new Board(3);
+        impVal(b.values);
+        System.out.println("white: "+b.white_count()+" black: "+b.black_count());
+        System.out.println("************************************");
+        b.play(true,0, 0, RIGHT);
+        impVal(b.values);
+        System.out.println("white: "+b.white_count()+" black: "+b.black_count());
+        System.out.println("************************************");
+        b.play(false,0, 1, RIGHT);
+        impVal(b.values);
+        System.out.println("white: "+b.white_count()+" black: "+b.black_count());
+        System.out.println("************************************");
+        b.play(true,1, 0, RIGHT);
+        impVal(b.values);
+        System.out.println("white: "+b.white_count()+" black: "+b.black_count());
+        System.out.println("************************************");
+        b.play(false,1, 1, RIGHT);
+        impVal(b.values);
+        System.out.println("white: "+b.white_count()+" black: "+b.black_count());
+    }
+    
     class NodoG {
 
         int mejorMovimientoI;
@@ -348,7 +427,7 @@ public class QuantalSquare implements AgentProgram {
         /*Tablero del juego.*/
         public Board tablero;
         /*Turno de la computadora.*/
-        boolean miTurno = false;
+        boolean miTurno = true;
         /*Indices del movimiento.*/
         int i;
         int j;

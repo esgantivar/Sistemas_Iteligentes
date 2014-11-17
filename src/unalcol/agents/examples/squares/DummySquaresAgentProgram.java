@@ -42,7 +42,7 @@ public class DummySquaresAgentProgram implements AgentProgram {
               if(((String)p.getAttribute(i+":"+j+":"+Squares.RIGHT)).equals(Squares.FALSE))
                 v.add(Squares.RIGHT);
             }
-//            System.out.println("movimiento: "+i + ":" + j + ":?");
+            System.out.println("movimiento: "+i + ":" + j + ":?");
             return new Action( i+":"+j+":"+v.get((int)(Math.random()*v.size())) );
         }
         return new Action(Squares.PASS);
